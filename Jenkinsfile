@@ -1,33 +1,44 @@
-pipeline{
+pipeline {
     agent any
-    
-    stages{
-        stage("Git Checkout"){
-            steps{
-                git url:"https://github.com/javahometech/reactjs-app",branch:"main"
+
+    tools {
+        nodejs 'nodejs'
+    }
+
+    environment {
+        PATH = "C:\\Program Files\\Amazon\\AWSCLIV2\\;$PATH"
+    }
+
+    stages {
+        stage('Checkout Git Repo') {
+            steps {
+                git url: "https://github.com/ShivamPant1321/devOpProject", branch: "main"
             }
         }
-        stage("Docker Build"){
-            steps{
-                sh "docker build -t kammana/react-app:${currentBuild.number} ."
+        stage('NPM Install') {
+            steps {
+                bat "npm install"
             }
         }
-        stage("Docker Push"){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'docker_password', usernameVariable: 'docker_user')]) {
-                    sh "docker login -u ${docker_user} -p ${docker_password}"
-                }
-                sh "docker push kammana/react-app:${currentBuild.number}"
+        stage('Node Build') {
+            steps {
+                bat "npm run build"
             }
         }
-        stage("Dev Deploy"){
-            steps{
-                sshagent(['docker-dev']) {
-        
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.15.57 docker rm -f react 2>/dev/null "
-                    sh "ssh ec2-user@172.31.15.57 docker run -d -p 80:80 --name=react kammana/react-app:${currentBuild.number}"
-                }
-            }
+        stage('S3 Deploy') {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: '797345580',
+            usernameVariable: 'AWS_ACCESS_KEY_ID',
+            passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+        )]) {
+            bat '''
+                set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
+                set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                aws s3 sync dist/ s3://jhc-reactapp --delete
+            '''
         }
+    }
+}
     }
 }
