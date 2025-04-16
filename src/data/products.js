@@ -3,6 +3,7 @@ export const products = [
     id: 1,
     name: "Wireless Bluetooth Headphones",
     price: 99.99,
+    originalPrice: 149.99,
     description: "Premium noise-cancelling headphones with crystal clear sound quality and 30-hour battery life.",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
     category: "Electronics",
@@ -14,7 +15,9 @@ export const products = [
       "Quick charge capability",
       "Bluetooth 5.0",
       "Built-in microphone"
-    ]
+    ],
+    colors: ["Black", "White", "Blue"],
+    isBestseller: true
   },
   {
     id: 2,
